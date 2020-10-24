@@ -12,10 +12,10 @@
 </head>
 <body>
 <!-- partial:index.partial.html -->
-<div id="particles-js"></div>
+<div class="position-fixed" id="particles-js"></div>
 
     <div id="app" style="text-align: center; position: relative;">
-        <h1 style="color: orange; margin: 0;padding: 65px 0 25px;" v-text="appName"></h1>
+        <h1 class="" style="color: orange; margin: 0;padding: 65px 0 25px;" v-text="appName"></h1>
         <div class="all">
             <input v-model="allDone" id="check" type="checkbox"></input>
             <input v-on:keyup.enter="add" v-model="todo.title" type="text" placeholder="New todo">
@@ -44,10 +44,9 @@
               <a @click.prevent="" href="" class="todo-count">{{leftItem}}</a>
               <a @click.prevent="removeCompleted()" href="" class="Clear-completed">Clear completed</a>
             </div>
-        
             
         </div>
-
+        <br><br> <br>
     </div>
 <!-- partial -->
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
