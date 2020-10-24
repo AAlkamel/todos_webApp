@@ -133,3 +133,7 @@ span:active{
 .editing{
     display: inherit;
 }
+
+.none{
+    display: none;
+}
