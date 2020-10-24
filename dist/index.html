@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>todo app</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="/css/all.min.css">
+<link rel="stylesheet" href="/css/style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div id="particles-js"></div>
+
+    <div id="app" style="text-align: center; position: relative;">
+        <h1 style="color: orange; margin: 0;padding: 65px 0 25px;" v-text="appName"></h1>
+        <div class="all">
+            <input v-model="allDone" id="check" type="checkbox"></input>
+            <input v-on:keyup.enter="add" v-model="todo.title" type="text" placeholder="New todo">
+            <hr style=" border: 0.4px solid rgb(112 128 144 / 9%); width: 85%; margin: 0px auto 10px;">
+
+            <div v-for="(item, i) in filteredTodo" class="todo">
+              
+                <p @dblclick="editTodo(i)" :class="{completed:item.completed}" v-text="item.title" ></p>
+                <input style="width: 70%;" class="edit " :class="{editing:i==editingTodo}" v-model="todos[i].title" @keyup.enter="editingDone()">
+
+                <span @click="deletetodo(item)" class="fa fa-times inactive" style="margin-right: 15px; position: absolute; right: 5%;"  ></span>
+                <span @click="item.completed=!item.completed" :class="{complate:item.completed}"   class="far fa-check-circle inactive" style="margin-right: 15px; position: absolute; left: 7%;  " ></span>
+
+                <hr style="border: 0.4px solid rgb(112 128 144 / 42%);width: 85%;margin: 10px auto 0px;">
+            </div>
+            
+            <div class="footer">
+              
+              <ul class="filters">
+
+                <li :class="{selected:visibility=='all'}"><a @click.prevent="visibility='all'" href="">All</a></li>
+                <li :class="{selected:visibility=='active'}"><a @click.prevent="visibility='active'" href="">Active</a></li>
+                <li :class="{selected:visibility=='completed'}"><a @click.prevent="visibility='completed'" href="">Completed</a></li>
+                
+              </ul>
+              <a @click.prevent="" href="" class="todo-count">{{leftItem}}</a>
+              <a @click.prevent="removeCompleted()" href="" class="Clear-completed">Clear completed</a>
+            </div>
+        
+            
+        </div>
+
+    </div>
+<!-- partial -->
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  <script src='https://cldup.com/S6Ptkwu_qA.js'></script>
+  <script  src="./script.js"></script>
+  <script src="/css/vue.js"></script>
+  <script>
+    var filter={
+      all:function(todos){
+        return todos;
+      },
+      active:function(todos){
+        return todos.filter(function(todo){
+          return !todo.completed
+        });
+      },
+      completed:function(todos){
+        return todos.filter(function(todo){
+          return todo.completed
+        });
+      }
+    }
+    var todos_storage ={
+      fetch:function(){
+        var todos =JSON.parse(localStorage.getItem('todos') || '[]');
+        return todos;
+      },
+      save:function(todos){
+        localStorage.setItem('todos',JSON.stringify(todos));
+      }
+    }
+    var vue = new Vue({
+      'el':'#app',
+      'data':{
+        editingTodo: null,
+        todos: todos_storage.fetch(),
+        appName:'Todo App',
+        todo:{
+          'title':'',
+          'completed':false,
+        },
+        visibility:'all',
+        editingTodo: null,
+      },
+      computed: {
+        filteredTodo:function(){
+          return filter[this.visibility](this.todos);
+        },
+        leftItem: function(){
+          if((filter.active(this.todos).length )> 1) return filter.active(this.todos).length +" items left" ;
+          return  filter.active(this.todos).length+" item left";
+        },
+        allDone: {
+          get:function(){
+          var x= filter.active(this.todos).length;
+          return x===0;
+          },
+          set:function(value){
+            this.todos.forEach(todo => {
+              todo.completed =value;
+            });
+          }
+        }
+      },
+      methods: {
+        add: function(){
+          if(!this.todo.title==''){
+            this.todos.unshift(this.todo);
+            this.todo={ 'title':'','completed':false,};
+          }
+          
+        },
+        deletetodo: function(todo){
+          this.todos.splice(this.todos.indexOf(todo),1);
+        },
+        removeCompleted: function(){
+          this.todos=filter.active (this.todos);
+        },
+        editTodo: function(todo){
+          this.editingTodo =todo;
+        },
+        editingDone: function(){
+          this.editingTodo =null;
+        }
+      },
+      watch: {
+        todos:{
+          handler:function(todos){
+            todos_storage.save(todos);
+          },
+          deep:true
+        }
+      },
+    })
+  </script> 
+</body>
+</html>
